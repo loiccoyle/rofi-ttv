@@ -1,0 +1,128 @@
+#!/bin/bash
+#             __ _       _   _
+#  _ __ ___  / _(_)     | |_| |___   __
+# | '__/ _ \| |_| |_____| __| __\ \ / /
+# | | | (_) |  _| |_____| |_| |_ \ V /
+# |_|  \___/|_| |_|      \__|\__| \_/
+
+# any failure in piped commands aborts pipe
+set -o pipefail
+
+TWITCH_NAME="zapig"
+
+# Please don't use and/or abuse this client-id/secret-id, don't be the reason we
+# can't have nice things.
+# If you really want a twitch client-id/secret-id just go make your own
+# here: https://dev.twitch.tv/console/apps/create
+CLIENT_ID="703gzdr4b7lxupwtgsmqd9zp8ribnu"
+CLIENT_SECRET="3mdyiw306f56t6yxq5o95yp7ug18io"
+
+# menu entry format
+FORMAT='"\(.user_name)\t\(.game_name)\t\(.title[:50])\t👀 \(.viewer_count)"'
+# available keys: see response keys at https://dev.twitch.tv/docs/api/reference#get-streams
+
+echoexit() {
+    # Print to stderr and exit
+    echo "$@" 1>&2
+    exit 1
+}
+
+# Checking dependencies:
+whereis curl > /dev/null || echoexit "'curl' not found."
+whereis jq > /dev/null || echoexit "'jq' not found."
+whereis rofi > /dev/null || echoexit "'rofi' not found."
+whereis youtube-dl > /dev/null || echoexit "'youtube-dl' not found."
+
+function menu (){
+    # Dynamic menu command. Should read from stdin and output to stdout.
+    rofi -dmenu -show -p "Select"
+    # it is important to propagate the error code in case the menu was aborted.
+    exit $?
+}
+
+function viewer (){
+    # View the twitch channel's stream.
+    # Args:
+    #    $1: channel name.
+
+    local channel="$1"
+    local url="https://twitch.tv/$channel"
+    local resolutions="$(youtube-dl -F "$url" | grep -v "\[" | tail -n +2)"
+    local resolution="$(echo "$resolutions" | rofi -dmenu -show | cut -d " " -f 1)"
+
+    youtube-dl "$url" -f $resolution -o - | mpv -
+}
+
+function get_access_token (){
+    # Get application access token.
+    # Returns:
+    #    string, Bearer token
+
+    local response="$(curl -s --location -X POST "https://id.twitch.tv/oauth2/token?client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&grant_type=client_credentials")"
+    echo "$response" | jq -r '.access_token'
+}
+
+function get_user_id (){
+    # Get user id.
+    # Returns:
+    #    user id
+
+    local response="$(curl -s --location -X GET "https://api.twitch.tv/helix/users?login=$TWITCH_NAME"\
+        --header "client-id: $CLIENT_ID"\
+        --header "Authorization: Bearer $TOKEN")"
+    echo "$response" | jq  -r '.data | .[].id'
+}
+
+function get_user_follows (){
+    # Get user's follows
+    # Args:
+    #    $1: user id.
+    # Returns:
+    #    space seperated string of user ids
+
+    local id="$1"
+    local response="$(curl -s --location -X GET "https://api.twitch.tv/helix/users/follows?from_id=$id&first=100"\
+        --header "client-id: $CLIENT_ID"\
+        --header "Authorization: Bearer $TOKEN")"
+    echo "$(echo "$response" | jq  -r '.data | .[].to_id')"
+    local pagination="$(echo "$response" | jq -r '.pagination.cursor')"
+    while [ "$pagination" != "null" ]
+    do
+        response="$(curl -s --location -X GET "https://api.twitch.tv/helix/users/follows?from_id=$id&first=100&after=$pagination"\
+            --header "client-id: $CLIENT_ID"\
+            --header "Authorization: Bearer $TOKEN")"
+        pagination="$(echo "$response" | jq -r '.pagination.cursor')"
+        echo "$(echo "$response" | jq -r '.data | .[].to_id')"
+    done
+}
+
+function get_online (){
+    # Args:
+    #    $1: space seperated string of user ids
+    # Returns:
+    #    string, each line is a channel.
+
+    local follows=($1)
+    local end=$((1 + ${#follows[@]}/100))
+    local jq_cmd='.[] | '"$FORMAT"
+    for ((i = 0; i<$end; i++));
+    do
+        local follows_url="user_id=$(echo ${follows[@]:$(($i*100)):$((($i+1)*100))} | sed 's/ /\&user_id=/g')"
+        # get live users
+        local response="$(curl -s --location -X GET "https://api.twitch.tv/helix/streams?$follows_url"\
+            --header "client-id: $CLIENT_ID"\
+            --header "Authorization: Bearer $TOKEN")"
+        local data="$(echo "$response" | jq -r '.data')"
+        echo "$(echo $data | jq -r ". [] | $FORMAT")"
+    done
+}
+
+# access token
+TOKEN="$(get_access_token)"
+
+user_id="$(get_user_id)"
+followed="$(get_user_follows "$user_id")"
+choices="$(get_online "$followed" | column -t -s "$(printf '\t')")"  # make nice columns
+channel="$(echo "$choices" | menu | cut -d " " -f 1)"
+# if a selection was made
+[[ $? == 0 ]] && viewer "$channel"
