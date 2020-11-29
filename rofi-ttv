@@ -32,6 +32,7 @@ whereis curl > /dev/null || echoexit "'curl' not found."
 whereis jq > /dev/null || echoexit "'jq' not found."
 whereis rofi > /dev/null || echoexit "'rofi' not found."
 whereis youtube-dl > /dev/null || echoexit "'youtube-dl' not found."
+whereis mpv > /dev/null || echoexit "'mpv' not found."
 
 function menu (){
     # Dynamic menu command. Should read from stdin and output to stdout.
