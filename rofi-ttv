@@ -35,6 +35,7 @@ whereis youtube-dl > /dev/null || echoexit "'youtube-dl' not found."
 
 function menu (){
     # Dynamic menu command. Should read from stdin and output to stdout.
+
     rofi -dmenu -show -p "Select"
     # it is important to propagate the error code in case the menu was aborted.
     exit $?
@@ -56,7 +57,7 @@ function viewer (){
 function get_access_token (){
     # Get application access token.
     # Returns:
-    #    string, Bearer token
+    #    string, Bearer token.
 
     local response="$(curl -s --location -X POST "https://id.twitch.tv/oauth2/token?client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&grant_type=client_credentials")"
     echo "$response" | jq -r '.access_token'
@@ -65,7 +66,7 @@ function get_access_token (){
 function get_user_id (){
     # Get user id.
     # Returns:
-    #    user id
+    #    string, user id.
 
     local response="$(curl -s --location -X GET "https://api.twitch.tv/helix/users?login=$TWITCH_NAME"\
         --header "client-id: $CLIENT_ID"\
@@ -74,11 +75,11 @@ function get_user_id (){
 }
 
 function get_user_follows (){
-    # Get user's follows
+    # Get user's follows.
     # Args:
     #    $1: user id.
     # Returns:
-    #    space seperated string of user ids
+    #    space seperated string of user ids.
 
     local id="$1"
     local response="$(curl -s --location -X GET "https://api.twitch.tv/helix/users/follows?from_id=$id&first=100"\
@@ -96,7 +97,8 @@ function get_user_follows (){
     done
 }
 
-function get_online (){
+function format_live (){
+    # Formats the live channels into strings ready for selection.
     # Args:
     #    $1: space seperated string of user ids
     # Returns:
@@ -108,7 +110,7 @@ function get_online (){
     for ((i = 0; i<$end; i++));
     do
         local follows_url="user_id=$(echo ${follows[@]:$(($i*100)):$((($i+1)*100))} | sed 's/ /\&user_id=/g')"
-        # get live users
+        # get live channels
         local response="$(curl -s --location -X GET "https://api.twitch.tv/helix/streams?$follows_url"\
             --header "client-id: $CLIENT_ID"\
             --header "Authorization: Bearer $TOKEN")"
@@ -122,7 +124,7 @@ TOKEN="$(get_access_token)"
 
 user_id="$(get_user_id)"
 followed="$(get_user_follows "$user_id")"
-choices="$(get_online "$followed" | column -t -s "$(printf '\t')")"  # make nice columns
+choices="$(format_live "$followed" | column -t -s "$(printf '\t')")"  # make nice columns
 channel="$(echo "$choices" | menu | cut -d " " -f 1)"
 # if a selection was made
 [[ $? == 0 ]] && viewer "$channel"
