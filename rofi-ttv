@@ -63,7 +63,7 @@ usage() {
     echo "To set your twitch username, either use the 'TTV_USERNAME'"
     echo "environment variable or write it to \"$USERNAME_FILE\":"
     echo ""
-    echo "\$ cat \"your_username\" > $USERNAME_FILE"
+    echo "\$ echo \"your_username\" > $USERNAME_FILE"
     echo ""
     echo "Usage:"
     echo "  rofi-ttv [-h]"
