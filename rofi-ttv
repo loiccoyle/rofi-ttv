@@ -9,6 +9,7 @@
 set -o pipefail
 
 # TTV_USERNAME=""
+USERNAME_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/rofi-ttv/ttv_username"
 
 # Please don't use and/or abuse this client-id/secret-id, don't be the reason we
 # can't have nice things.
@@ -59,9 +60,14 @@ usage() {
     # Print usage.
     echo "Dynamic menu interface for Twitch.tv"
     echo ""
+    echo "To set your twitch username, either use the 'TTV_USERNAME'"
+    echo "environment variable or write it to \"$USERNAME_FILE\":"
+    echo ""
+    echo "\$ cat \"your_username\" > $USERNAME_FILE"
+    echo ""
     echo "Usage:"
     echo "  rofi-ttv [-h]"
-    echo "    -h                                 Display this help message. "
+    echo "    -h                                 Display this help message."
     echo "  rofi-ttv search QUERY...             Search channels."
     echo "    QUERY                              Search query."
     echo "  rofi-ttv followed                    Show followed channels."
@@ -194,8 +200,7 @@ TOKEN="$(get_access_token)"
 
 if [ "$selected" == "Followed" ]; then
     if [ -z "$TTV_USERNAME" ]; then
-        username_file="${XDG_CONFIG_HOME:-$HOME/.config}/rofi-ttv/ttv_username"
-        [ -f "$username_file" ] && TTV_USERNAME="$(cat $username_file)" || echoexit "Can't find username, try \"echo 'your_username' > $username_file\""
+        [ -f "$USERNAME_FILE" ] && TTV_USERNAME="$(cat $username_file)" || echoexit "Can't find username, try \"echo 'your_username' > $username_file\""
     fi
     IDS="$(get_user_follows "$(get_user_id)")"
 
