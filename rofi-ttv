@@ -37,7 +37,7 @@ whereis mpv > /dev/null || echoexit "'mpv' not found."
 function menu (){
     # Dynamic menu command. Should read from stdin and output to stdout.
 
-    rofi -dmenu -show -p "Search/Select"
+    rofi -dmenu -no-fixed-num-lines -p "Search/Select"
     # it is important to propagate the error code in case the menu was aborted.
     exit $?
 }
