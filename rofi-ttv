@@ -51,7 +51,7 @@ function viewer (){
     local channel="$1"
     local url="https://twitch.tv/$channel"
     local resolutions="$(youtube-dl -F "$url" | grep -v "\[" | tail -n +2)"
-    local resolution="$(echo "$resolutions" | rofi -dmenu -show | cut -d " " -f 1)"
+    local resolution="$(echo "$resolutions" | menu | cut -d " " -f 1)"
 
     youtube-dl "$url" -f $resolution -o - | mpv -
 }
