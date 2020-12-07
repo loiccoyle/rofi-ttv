@@ -98,7 +98,7 @@ function get_user_follows (){
     # Args:
     #    $1: user id.
     # Returns:
-    #    space seperated string of user ids.
+    #    string of user ids.
 
     local id="$1"
     local response="$(curl -s --location -G "https://api.twitch.tv/helix/users/follows?from_id=$id&first=100"\
@@ -117,6 +117,12 @@ function get_user_follows (){
 }
 
 function search (){
+    # Search for twitch channels
+    # Args:
+    #    $1: query.
+    # Returns:
+    #    string of user ids.
+
     local query="$1"
     local response="$(curl -s --location -G "https://api.twitch.tv/helix/search/channels?live_only=true&first=100"\
         --data-urlencode "query=$query"\
