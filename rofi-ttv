@@ -57,20 +57,19 @@ function viewer (){
 }
 
 usage() {
-    # Print usage.
-    echo "Dynamic menu interface for Twitch.tv"
-    echo ""
-    echo "To set your twitch username, either use the 'TTV_USERNAME'"
-    echo "environment variable or write it to \"$USERNAME_FILE\":"
-    echo ""
-    echo "\$ echo \"your_username\" > $USERNAME_FILE"
-    echo ""
-    echo "Usage:"
-    echo "  rofi-ttv [-h]"
-    echo "    -h                                 Display this help message."
-    echo "  rofi-ttv search QUERY...             Search channels."
-    echo "    QUERY                              Search query."
-    echo "  rofi-ttv followed                    Show followed channels."
+    echo "Dynamic menu interface for Twitch.tv
+
+To set your twitch username, either use the 'TTV_USERNAME'
+environment variable or write it to \"$USERNAME_FILE\":
+
+\$ echo \"your_username\" > $USERNAME_FILE
+
+Usage:
+  rofi-ttv [-h]
+    -h                                 Display this help message.
+  rofi-ttv search QUERY...             Search channels.
+    QUERY                              Search query.
+  rofi-ttv followed                    Show followed channels."
 }
 
 function get_access_token (){
