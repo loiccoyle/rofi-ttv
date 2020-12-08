@@ -9,7 +9,10 @@
 set -o pipefail
 
 # TTV_USERNAME=""
-USERNAME_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/rofi-ttv/ttv_username"
+ROFI_TTV_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/rofi-ttv"
+USERNAME_FILE="${ROFI_TTV_DIR}/ttv_username"
+TOKEN_FILE="${ROFI_TTV_DIR}/access_token"
+TOKEN_EXPIRY_FILE="${ROFI_TTV_DIR}/access_token_expiry"
 
 # Please don't use and/or abuse this client-id/secret-id, don't be the reason we
 # can't have nice things.
@@ -76,9 +79,20 @@ function get_access_token (){
     # Get application access token.
     # Returns:
     #    string, Bearer token.
+    local current_date=$(date +%s)
+    [ -f $TOKEN_FILE ] && [ -f $TOKEN_EXPIRY_FILE ] && local token="$(cat "$TOKEN_FILE")" && local token_expiry=$(cat "$TOKEN_EXPIRY_FILE")
 
+    # if the token variables are populated and we are not past the expiry date
+    [ ! -z $token_expiry ] && [ ! -z $token ] && [ $current_date -lt $token_expiry ] && echo "$token" && return
+
+    # otherwise generate a new one
     local response="$(curl -s --location -X POST "https://id.twitch.tv/oauth2/token?client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&grant_type=client_credentials")"
-    echo "$response" | jq -r '.access_token'
+    local token="$(echo "$response" | jq -r '.access_token')"
+    local expiring="$(echo "$response" | jq -r '.expires_in')"
+    # write to file
+    echo "$token" > $TOKEN_FILE
+    echo "$(($current_date + $expiring))" > $TOKEN_EXPIRY_FILE
+    echo "$token"
 }
 
 function get_user_id (){
@@ -123,7 +137,7 @@ function search (){
     #    string of user ids.
 
     local query="$1"
-    local response="$(curl -s --location -G "https://api.twitch.tv/helix/search/channels?live_only=true&first=100"\
+    local response="$(curl -s --location -G "https://api.twitch.tv/helix/search/channels?live_only=true&first=20"\
         --data-urlencode "query=$query"\
         --header "client-id: $CLIENT_ID"\
         --header "Authorization: Bearer $TOKEN")"
@@ -138,17 +152,19 @@ function format_live (){
     #    string, each line is a channel.
 
     local follows=($1)
+    echo "${follows[@]}" > follows
     local end=$((1 + ${#follows[@]}/100))
     local jq_cmd='.[] | '"$FORMAT"
     for ((i = 0; i<$end; i++));
     do
-        local follows_url="user_id=$(echo ${follows[@]:$(($i*100)):$((($i+1)*100))} | sed 's/ /\&user_id=/g')"
+        local follows_url="user_id=$(echo ${follows[@]:$(($i*100)):100} | sed 's/ /\&user_id=/g')"
         # get live channels
         local response="$(curl -s --location -G "https://api.twitch.tv/helix/streams?$follows_url"\
             --header "client-id: $CLIENT_ID"\
             --header "Authorization: Bearer $TOKEN")"
         local data="$(echo "$response" | jq -r '.data')"
-        echo $data | jq -r ". [] | $FORMAT"
+        # remove \n in titles
+        echo "$data" | sed -e 's/\\n//g' | jq -r ". [] | $FORMAT"
     done
 }
 
@@ -168,9 +184,10 @@ while getopts ":he" opt; do
     esac
 done
 shift $((OPTIND -1))
-OPTIND=1
 
-subcommand=$1; shift  # Remove 'rofi-ttv' from the argument list
+subcommand="$1"
+# Remove 'rofi-ttv' from the argument list
+[ ! -z $subcommand ] && shift
 case "$subcommand" in
     # Parse options to the sub command
     search )
@@ -199,6 +216,9 @@ case "$subcommand" in
         exit 1
         ;;
 esac
+
+# make the directory if it does not exist.
+[ ! -d "$ROFI_TTV_DIR" ] && mkdir "$ROFI_TTV_DIR"
 
 # access token
 TOKEN="$(get_access_token)"
