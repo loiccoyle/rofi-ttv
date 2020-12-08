@@ -10,7 +10,7 @@ set -o pipefail
 
 # TTV_USERNAME=""
 ROFI_TTV_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/rofi-ttv"
-USERNAME_FILE="${ROFI_TTV_DIR}/ttv_username"
+USERNAME_FILE="${ROFI_TTV_DIR}/username"
 TOKEN_FILE="${ROFI_TTV_DIR}/access_token"
 TOKEN_EXPIRY_FILE="${ROFI_TTV_DIR}/access_token_expiry"
 

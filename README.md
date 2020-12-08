@@ -25,11 +25,10 @@ yay -S rofi-ttv-git
 
 # Configuration:
 
-To view your followed channels, you will need to tell `rofi-ttv` your username. To specify your username you can either use the `TTV_USERNAME` environment variable or you can write it to `${XDG_CONFIG_HOME:-$HOME/.config}/rofi-ttv/ttv_username` for example:
+To view your followed channels, you will need to tell `rofi-ttv` your username. To specify your username you can either use the `TTV_USERNAME` environment variable or you can write it to `${XDG_CONFIG_HOME:-$HOME/.config}/rofi-ttv/username` for example:
 
 ```sh
-$ mkdir ~/.config/rofi-ttv
-$ echo "your_username" > ~/.config/rofi-ttv/ttv_username
+$ echo "your_username" > ~/.config/rofi-ttv/username
 ```
 
 To adjust the format with which the streams appear in the menu, adjust the `FORMAT` variable in the `rofi-ttv` script.
