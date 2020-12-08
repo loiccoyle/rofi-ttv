@@ -16,7 +16,7 @@ Soft coded:
 
 # Installation:
 
-Just git clone this repo and place the `rofi-ttv` file somewhere on your `PATH`.
+Just git clone this repo and place the `rofi-ttv` file somewhere on your `PATH` and make sure it is executable `chmod +x rofi-ttv`.
 
 For Arch Linux (and derivatives):
 ```sh
@@ -34,4 +34,4 @@ $ echo "your_username" > ~/.config/rofi-ttv/ttv_username
 
 To adjust the format with which the streams appear in the menu, adjust the `FORMAT` variable in the `rofi-ttv` script.
 
-If you don't user `rofi`, `youtube-dl` or `mpv`, no problem, their usage is contained in the `menu` and `viewer` functions of the `rofi-ttv` script. So just adjust them to use your desired programs.
+If you don't use `rofi`, `youtube-dl` or `mpv`, no problem, their usage is contained in the `menu` and `viewer` functions of the `rofi-ttv` script. So just adjust them to use your desired programs.
