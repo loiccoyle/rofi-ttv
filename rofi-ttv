@@ -152,7 +152,6 @@ function format_live (){
     #    string, each line is a channel.
 
     local follows=($1)
-    echo "${follows[@]}" > follows
     local end=$((1 + ${#follows[@]}/100))
     local jq_cmd='.[] | '"$FORMAT"
     for ((i = 0; i<$end; i++));
