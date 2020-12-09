@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #             __ _       _   _
 #  _ __ ___  / _(_)     | |_| |___   __
 # | '__/ _ \| |_| |_____| __| __\ \ / /
@@ -7,6 +7,8 @@
 
 # any failure in piped commands aborts pipe
 set -o pipefail
+# exit when any command fails
+set -e
 
 # TTV_USERNAME=""
 ROFI_TTV_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/rofi-ttv"
@@ -41,9 +43,13 @@ whereis mpv > /dev/null || echoexit "'mpv' not found."
 function menu (){
     # Dynamic menu command. Should read from stdin and output to stdout.
 
-    rofi -dmenu -p "Search/Select"
-    # it is important to propagate the error code in case the menu was aborted.
-    exit $?
+    rofi -dmenu -p "Select"
+}
+
+function input (){
+    # Prompt for user input. Should output to stdout.
+
+    rofi -dmenu -p "Search" -lines 0
 }
 
 function viewer (){
@@ -192,7 +198,7 @@ case "$subcommand" in
     search )
         QUERY="$@"
         # no search query
-        [ -z "$QUERY" ] && QUERY="$(menu)"
+        [ -z "$QUERY" ] && QUERY="$(input)"
         selected="Search"
         ;;
 
@@ -204,9 +210,8 @@ case "$subcommand" in
     "" )
         # let the user chose
         selected="$(echo -e "Search\nFollowed" | menu)"
-        [[ $? != 0 ]] && exit $?
-        # seach query
-        [ "$selected" == "Search" ] && QUERY="$(menu)"
+        # search query
+        [ "$selected" == "Search" ] && QUERY="$(input)"
         ;;
 
     * )
@@ -216,12 +221,13 @@ case "$subcommand" in
         ;;
 esac
 
-# make the directory if it does not exist.
+# Make the directory if it does not exist.
 [ ! -d "$ROFI_TTV_DIR" ] && mkdir "$ROFI_TTV_DIR"
 
-# access token
+# Access token
 TOKEN="$(get_access_token)"
 
+# Get ids of searched/followed channels
 if [ "$selected" == "Followed" ]; then
     if [ -z "$TTV_USERNAME" ]; then
         [ -f "$USERNAME_FILE" ] && TTV_USERNAME="$(cat $USERNAME_FILE)" || echoexit "Can't find username, try \"echo 'your_username' > $USERNAME_FILE\""
@@ -232,7 +238,9 @@ elif [ "$selected" == "Search" ]; then
     IDS="$(search "$QUERY")"
 fi
 
+# Create menu entries
 CHOICES="$(format_live "$IDS" | column -t -s "$(printf '\t')")"  # make nice columns
+# Select channel
 CHANNEL="$(echo "$CHOICES" | menu | cut -d " " -f 1)"
-# if a selection was made
-[[ $? == 0 ]] && viewer "$CHANNEL"
+# view stream
+viewer "$CHANNEL"
