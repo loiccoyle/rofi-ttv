@@ -33,4 +33,4 @@ $ echo "your_username" > ~/.config/rofi-ttv/username
 
 To adjust the format with which the streams appear in the menu, adjust the `FORMAT` variable in the `rofi-ttv` script.
 
-If you don't use `rofi`, `youtube-dl` or `mpv`, no problem, their usage is contained in the `menu` and `viewer` functions of the `rofi-ttv` script. So just adjust them to use your desired programs.
+If you don't use `rofi`, `youtube-dl` or `mpv`, no problem, their usage is contained in the `menu`, `input` and `viewer` functions of the `rofi-ttv` script. So just adjust them to use your desired programs.
