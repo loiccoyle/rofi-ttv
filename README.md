@@ -1,5 +1,12 @@
 # rofi-ttv
-[![AUR version](https://img.shields.io/aur/version/rofi-ttv-git)](https://aur.archlinux.org/packages/rofi-ttv-git/)
+<p align="center">
+  <img src="https://i.imgur.com/e2vdSts.png">
+</p>
+
+<p align="center">
+  <a href="./LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+  <a href="https://aur.archlinux.org/packages/rofi-ttv-git/"><img src="https://img.shields.io/aur/version/rofi-ttv-git"></a>
+</p>
 
 A scripts that uses `rofi`, `youtube-dl` and `mpv` to view twitch streams.
 
