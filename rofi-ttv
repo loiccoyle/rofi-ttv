@@ -175,7 +175,7 @@ function format_live (){
 
 
 # Parse options to the `rofi-ttv` command
-while getopts ":he" opt; do
+while getopts ":h" opt; do
     case ${opt} in
         h )
             usage
