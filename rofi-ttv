@@ -93,8 +93,8 @@ function get_access_token (){
 
     # otherwise generate a new one
     local response="$(curl -s --location -X POST "https://id.twitch.tv/oauth2/token?client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&grant_type=client_credentials")"
-    local token="$(printf "$response" | jq -r '.access_token')"
-    local expiring="$(printf "$response" | jq -r '.expires_in')"
+    local token="$(printf "%s" "$response" | jq -r '.access_token')"
+    local expiring="$(printf "%s" "$response" | jq -r '.expires_in')"
     # write to file
     printf "$token" > $TOKEN_FILE
     printf "$(($current_date + $expiring))" > $TOKEN_EXPIRY_FILE
@@ -109,7 +109,7 @@ function get_user_id (){
     local response="$(curl -s --location -G "https://api.twitch.tv/helix/users?login=$TTV_USERNAME"\
         --header "client-id: $CLIENT_ID"\
         --header "Authorization: Bearer $TOKEN")"
-    printf "$response" | jq  -r '.data | .[].id'
+    printf "%s" "$response" | jq  -r '.data | .[].id'
 }
 
 function get_user_follows (){
@@ -123,7 +123,7 @@ function get_user_follows (){
     local response="$(curl -s --location -G "https://api.twitch.tv/helix/users/follows?from_id=$id&first=100"\
         --header "client-id: $CLIENT_ID"\
         --header "Authorization: Bearer $TOKEN")"
-    printf "$response" | jq  -r '.data | .[].to_id'
+    printf "%s" "$response" | jq  -r '.data | .[].to_id'
     local pagination="$(printf "$response" | jq -r '.pagination.cursor')"
     while [ "$pagination" != "null" ]
     do
@@ -131,7 +131,7 @@ function get_user_follows (){
             --header "client-id: $CLIENT_ID"\
             --header "Authorization: Bearer $TOKEN")"
         pagination="$(printf "$response" | jq -r '.pagination.cursor')"
-        printf "$response" | jq -r '.data | .[].to_id'
+        printf "%s" "$response" | jq -r '.data | .[].to_id'
     done
 }
 
@@ -167,9 +167,9 @@ function format_live (){
         local response="$(curl -s --location -G "https://api.twitch.tv/helix/streams?$follows_url"\
             --header "client-id: $CLIENT_ID"\
             --header "Authorization: Bearer $TOKEN")"
-        local data="$(printf "$response" | jq -r '.data')"
+        local data="$(printf "%s" "$response" | jq -r '.data')"
         # remove \n in titles
-        printf "$data" | sed -e 's/\\n//g' | jq -r ". [] | $FORMAT"
+        printf "%s" "$data" | sed -e 's/\\n//g' | jq -r ". [] | $FORMAT"
     done
 }
 
@@ -240,7 +240,8 @@ fi
 
 # Create menu entries
 CHOICES="$(format_live "$IDS" | column -t -s "$(printf '\t')")"  # make nice columns
+echo "$CHOICES"
 # Select channel
-CHANNEL="$(printf "$CHOICES" | menu | cut -d " " -f 1)"
+CHANNEL="$(printf "%s" "$CHOICES" | menu | cut -d " " -f 1)"
 # view stream
 viewer "$CHANNEL"
