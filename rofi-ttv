@@ -22,7 +22,7 @@ CLIENT_ID="703gzdr4b7lxupwtgsmqd9zp8ribnu"
 CLIENT_SECRET="3mdyiw306f56t6yxq5o95yp7ug18io"
 
 # Menu entry format
-FORMAT='"\(.user_name)\t\(.game_name)\t\(.title[:50])\t👀 \(.viewer_count)"'
+FORMAT='"\(.user_name)\t\(.game_name)\t\(.title[:50])\t👤 \(.viewer_count)"'
 # available keys: see response keys at https://dev.twitch.tv/docs/api/reference#get-streams
 
 echoexit() {
