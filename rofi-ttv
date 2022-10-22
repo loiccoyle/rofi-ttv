@@ -41,7 +41,7 @@ whereis mpv > /dev/null || echoexit "'mpv' not found."
 menu (){
     # Dynamic menu command. Should read from stdin and output to stdout.
 
-    rofi -dmenu -p "Select"
+    rofi -dmenu -p "Select" -i
 }
 
 input (){
@@ -228,7 +228,7 @@ case "$subcommand" in
 
     "" )
         # Let the user chose
-        selected="$(printf "Search\nFollowed" | menu)"
+        selected="$(printf "Followed\nSearch" | menu)"
         # User input search query
         [ "$selected" = "Search" ] && QUERY="$(input)"
         ;;
