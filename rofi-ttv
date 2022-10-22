@@ -38,19 +38,13 @@ whereis rofi > /dev/null || echoexit "'rofi' not found."
 whereis youtube-dl > /dev/null || echoexit "'youtube-dl' not found."
 whereis mpv > /dev/null || echoexit "'mpv' not found."
 
-menu (){
-    # Dynamic menu command. Should read from stdin and output to stdout.
+# Dynamic menu command. Should read from stdin and output to stdout.
+MENU_CMD=(rofi -dmenu -p "Select" -i)
 
-    rofi -dmenu -p "Select" -i
-}
+# Prompt for user input. Should output to stdout.
+INPUT_CMD=(rofi -dmenu -p "Search" -l 0)
 
-input (){
-    # Prompt for user input. Should output to stdout.
-
-    rofi -dmenu -p "Search" -lines 0
-}
-
-viewer (){
+view (){
     # View the twitch channel's stream.
     # Args:
     #    $1: channel name.
@@ -217,7 +211,7 @@ case "$subcommand" in
     search )
         QUERY="$*"
         # No search query
-        [ -z "$QUERY" ] && QUERY="$(input)"
+        [ -z "$QUERY" ] && QUERY="$("${INPUT_CMD[@]}")"
         selected="Search"
         ;;
 
@@ -228,9 +222,9 @@ case "$subcommand" in
 
     "" )
         # Let the user chose
-        selected="$(printf "Followed\nSearch" | menu)"
+        selected="$(printf "Followed\nSearch" | "${MENU_CMD[@]}" -l 2)"
         # User input search query
-        [ "$selected" = "Search" ] && QUERY="$(input)"
+        [ "$selected" = "Search" ] && QUERY="$("${INPUT_CMD[@]}")"
         ;;
 
     * )
@@ -264,6 +258,6 @@ fi
 # Create menu entries
 CHOICES="$(format_live "$IDS" | column -t -s "$(printf '\t')")"  # make nice columns
 # Select channel
-CHANNEL="$(printf "%s" "$CHOICES" | menu | cut -d " " -f 1)"
+CHANNEL="$(printf "%s" "$CHOICES" | "${MENU_CMD[@]}" | cut -d " " -f 1)"
 # View stream
-[ -n "$CHANNEL" ] && viewer "$CHANNEL"
+[ -n "$CHANNEL" ] && view "$CHANNEL"
