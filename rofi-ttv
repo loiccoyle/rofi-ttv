@@ -56,7 +56,7 @@ view (){
     channel="$1"
     url="https://twitch.tv/$channel"
     resolutions="$(youtube-dl -F "$url" | grep -v "\[" | tail -n +2)"
-    resolution="$(printf "%s" "$resolutions" | menu | cut -d " " -f 1)"
+    resolution="$(printf "%s" "$resolutions" | "${MENU_CMD[@]}" | cut -d " " -f 1)"
     [ -n "$resolution" ] && youtube-dl "$url" -f "$resolution" -o - | mpv -
 }
 
