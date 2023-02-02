@@ -1,4 +1,5 @@
 # rofi-ttv
+
 <p align="center">
   <img src="https://i.imgur.com/e2vdSts.png">
 </p>
@@ -13,21 +14,24 @@ A scripts that uses `rofi`, `youtube-dl` and `mpv` to view twitch streams.
 # Dependencies:
 
 Hard coded:
- * `curl`
- * `jq`
+
+- `curl`
+- `jq`
 
 Soft coded:
- * `rofi`
- * `youtube-dl`
- * `mpv`
+
+- `rofi`
+- `youtube-dl`
+- `mpv`
 
 # Installation:
 
 Just git clone this repo and place the `rofi-ttv` file somewhere on your `PATH` and make sure it is executable `chmod +x rofi-ttv`.
 
 For Arch Linux (and derivatives):
+
 ```sh
-yay -S rofi-ttv-git
+paru -S rofi-ttv-git
 ```
 
 # Configuration:
@@ -40,4 +44,4 @@ $ echo "your_username" > ~/.config/rofi-ttv/username
 
 To adjust the format with which the streams appear in the menu, adjust the `FORMAT` variable in the `rofi-ttv` script.
 
-If you don't use `rofi`, `youtube-dl` or `mpv`, no problem, their usage is contained in the `menu`, `input` and `viewer` functions of the `rofi-ttv` script. So just adjust them to use your desired programs.
+If you don't use `rofi`, `youtube-dl` or `mpv`, no problem, their usage is contained in the `MENU_CMD`, `INPUT_CMD` variables and the `view` functions of the `rofi-ttv` script. So just adjust them to use your desired programs.
