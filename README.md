@@ -11,20 +11,7 @@
 
 A scripts that uses `rofi`, `youtube-dl` and `mpv` to view twitch streams.
 
-# Dependencies:
-
-Hard coded:
-
-- `curl`
-- `jq`
-
-Soft coded:
-
-- `rofi`
-- `youtube-dl`
-- `mpv`
-
-# Installation:
+## 📦 Installation
 
 Just git clone this repo and place the `rofi-ttv` file somewhere on your `PATH` and make sure it is executable `chmod +x rofi-ttv`.
 
@@ -34,14 +21,51 @@ For Arch Linux (and derivatives):
 paru -S rofi-ttv-git
 ```
 
-# Configuration:
+### Dependencies
 
-To view your followed channels, you will need to tell `rofi-ttv` your username. To specify your username you can either use the `TTV_USERNAME` environment variable or you can write it to `${XDG_CONFIG_HOME:-$HOME/.config}/rofi-ttv/username` for example:
+- `curl`
+- `jq`
+- `rofi`
+- `youtube-dl`
+- `mpv`
+
+## ⚙️ Configuration
+
+To view your followed channels, you will need to tell `rofi-ttv` your username. To specify your username you can either use the `$TTV_USERNAME` environment variable or you can write it to `${XDG_CONFIG_HOME:-$HOME/.config}/rofi-ttv/username` for example:
 
 ```sh
 $ echo "your_username" > ~/.config/rofi-ttv/username
 ```
 
-To adjust the format with which the streams appear in the menu, adjust the `FORMAT` variable in the `rofi-ttv` script.
+If in doubt see the help:
+
+<!-- help start -->
+
+```console
+$ rofi-ttv -h
+Dynamic menu interface for Twitch.tv
+
+To set your twitch username, either use the 'TTV_USERNAME'
+environment variable or write it to '/home/lcoyle/.config/rofi-ttv/username':
+
+$ echo "your_username" > /home/lcoyle/.config/rofi-ttv/username
+
+Usage:
+  rofi-ttv [-hf] [followed|search [QUERY]]
+    -h                         Display this help message.
+    -f                         Menu format.
+                               default: \(.user_name)\t\(.game_name[:30])\t\(.title[:50])\t👤 \(.viewer_count)
+  rofi-ttv search QUERY...     Search channels.
+    QUERY                      Search query.
+  rofi-ttv followed            Show followed channels.
+```
+
+<!-- help end -->
+
+To adjust the format with which the streams appear in the menu, use the `-f` option, a list of fields can be found in the [twitch api docs](https://dev.twitch.tv/docs/api/reference/#get-streams).
 
 If you don't use `rofi`, `youtube-dl` or `mpv`, no problem, their usage is contained in the `MENU_CMD`, `INPUT_CMD` variables and the `view` functions of the `rofi-ttv` script. So just adjust them to use your desired programs.
+
+```
+
+```
