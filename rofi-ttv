@@ -39,7 +39,7 @@ type youtube-dl >/dev/null || echoexit "'youtube-dl' not found."
 type mpv >/dev/null || echoexit "'mpv' not found."
 
 # Dynamic menu command. Should read from stdin and output to stdout.
-MENU_CMD=(rofi -dmenu -p "Select" -i)
+MENU_CMD=(rofi -dmenu -p "Twitch" -i)
 
 # Prompt for user input. Should output to stdout.
 INPUT_CMD=(rofi -dmenu -p "Search" -l 0)
