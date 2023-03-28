@@ -63,5 +63,3 @@ Usage:
 <!-- help end -->
 
 To adjust the format with which the streams appear in the menu, use the `-f` option, a list of fields can be found in the [twitch api docs](https://dev.twitch.tv/docs/api/reference/#get-streams).
-
-If you don't use `rofi`, `youtube-dl` or `mpv`, no problem, their usage is contained in the `MENU_CMD`, `INPUT_CMD` variables and the `view` functions of the `rofi-ttv` script. So just adjust them to use your desired programs.
