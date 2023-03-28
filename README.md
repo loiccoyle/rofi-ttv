@@ -53,7 +53,7 @@ $ echo "your_username" > ~/.config/rofi-ttv/username
 Usage:
   rofi-ttv [-hf] [followed|search [QUERY]]
     -h                         Display this help message.
-    -f                         Menu format. 
+    -f                         Menu format.
                                default: \(.user_name)\t\(.game_name[:30])\t\(.title[:50])\t👤 \(.viewer_count)
   rofi-ttv search QUERY...     Search channels.
     QUERY                      Search query.
@@ -65,7 +65,3 @@ Usage:
 To adjust the format with which the streams appear in the menu, use the `-f` option, a list of fields can be found in the [twitch api docs](https://dev.twitch.tv/docs/api/reference/#get-streams).
 
 If you don't use `rofi`, `youtube-dl` or `mpv`, no problem, their usage is contained in the `MENU_CMD`, `INPUT_CMD` variables and the `view` functions of the `rofi-ttv` script. So just adjust them to use your desired programs.
-
-```
-
-```
