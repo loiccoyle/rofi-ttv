@@ -19,11 +19,7 @@ TOKEN_EXPIRY_FILE="${ROFI_TTV_DIR}/access_token_expiry"
 # If you really want a twitch client-id/secret-id just go make your own
 # here: https://dev.twitch.tv/console/apps/create
 CLIENT_ID="703gzdr4b7lxupwtgsmqd9zp8ribnu"
-CLIENT_SECRET="3mdyiw306f56t6yxq5o95yp7ug18io"
-
-# Menu entry format
-FORMAT='"\(.user_name)\t\(.game_name)\t\(.title[:50])\t👤 \(.viewer_count)"'
-# available keys: see response keys at https://dev.twitch.tv/docs/api/reference#get-streams
+CLIENT_SECRET="$(echo "M21keWl3MzA2ZjU2dDZ5eHE1bzk1eXA3dWcxOGlvCg==" | base64 -d -)"
 
 echoexit() {
     # Print to stderr and exit
@@ -31,15 +27,8 @@ echoexit() {
     exit 1
 }
 
-# Checking dependencies:
-type curl >/dev/null || echoexit "'curl' not found."
-type jq >/dev/null || echoexit "'jq' not found."
-type rofi >/dev/null || echoexit "'rofi' not found."
-type youtube-dl >/dev/null || echoexit "'youtube-dl' not found."
-type mpv >/dev/null || echoexit "'mpv' not found."
-
 # Dynamic menu command. Should read from stdin and output to stdout.
-MENU_CMD=(rofi -dmenu -p "Select" -i)
+MENU_CMD=(rofi -dmenu -p "Twitch" -i)
 
 # Prompt for user input. Should output to stdout.
 INPUT_CMD=(rofi -dmenu -p "Search" -l 0)
@@ -64,16 +53,20 @@ usage() {
     printf "Dynamic menu interface for Twitch.tv
 
 To set your twitch username, either use the 'TTV_USERNAME'
-environment variable or write it to \"$USERNAME_FILE\":
+environment variable or write it to '%s':
 
 \$ echo \"your_username\" > %s
 
 Usage:
-  rofi-ttv [-h]
-    -h                                 Display this help message.
-  rofi-ttv search QUERY...             Search channels.
-    QUERY                              Search query.
-  rofi-ttv followed                    Show followed channels." "$USERNAME_FILE"
+  rofi-ttv [-hf] [followed|search [QUERY]]
+    -h                         Display this help message.
+    -f                         Menu format.
+                               default: %s
+  rofi-ttv search QUERY...     Search channels.
+    QUERY                      Search query.
+  rofi-ttv followed            Show followed channels.
+" \
+        "$USERNAME_FILE" "$USERNAME_FILE" "$FORMAT"
 }
 
 get_access_token() {
@@ -180,16 +173,22 @@ format_live() {
             --header "Authorization: Bearer $TOKEN")"
         data="$(printf "%s" "$response" | jq -r '.data')"
         # remove \n in titles
-        printf "%s" "$data" | sed -e 's/\\n//g' | jq -r ". [] | $FORMAT"
+        printf "%s" "$data" | sed -e 's/\\n//g' | jq -r ". [] | \"$FORMAT\""
     done
 }
 
+# Menu entry format
+# available keys: see response keys at https://dev.twitch.tv/docs/api/reference#get-streams
+FORMAT='\(.user_name)\t\(.game_name[:30])\t\(.title[:50])\t👤 \(.viewer_count)'
 # Parse options to the `rofi-ttv` command
-while getopts ":h" opt; do
+while getopts ":hf:" opt; do
     case ${opt} in
     h)
         usage
         exit 0
+        ;;
+    f)
+        FORMAT="$OPTARG"
         ;;
     \?)
         printf "Invalid Option: -%s\n" "$OPTARG" 1>&2
@@ -199,6 +198,13 @@ while getopts ":h" opt; do
     esac
 done
 shift $((OPTIND - 1))
+
+# Checking dependencies:
+type curl >/dev/null || echoexit "'curl' not found."
+type jq >/dev/null || echoexit "'jq' not found."
+type rofi >/dev/null || echoexit "'rofi' not found."
+type youtube-dl >/dev/null || echoexit "'youtube-dl' not found."
+type mpv >/dev/null || echoexit "'mpv' not found."
 
 subcommand="$1"
 # Remove 'rofi-ttv' from the argument list
