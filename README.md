@@ -43,6 +43,21 @@ If in doubt see the help:
 
 ```console
 $ rofi-ttv -h
+Dynamic menu interface for Twitch.tv
+
+To set your twitch username, either use the 'TTV_USERNAME'
+environment variable or write it to '~/.config/rofi-ttv/username':
+
+$ echo "your_username" > ~/.config/rofi-ttv/username
+
+Usage:
+  rofi-ttv [-hf] [followed|search [QUERY]]
+    -h                         Display this help message.
+    -f                         Menu format.
+                               default: \(.user_name)\t\(.game_name[:30])\t\(.title[:50])\t👤 \(.viewer_count)
+  rofi-ttv search QUERY...     Search channels.
+    QUERY                      Search query.
+  rofi-ttv followed            Show followed channels.
 ```
 
 <!-- help end -->
