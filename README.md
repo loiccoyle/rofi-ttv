@@ -53,7 +53,7 @@ $ echo "your_username" > ~/.config/rofi-ttv/username
 Usage:
   rofi-ttv [-hf] [followed|search [QUERY]]
     -h                         Display this help message.
-    -f                         Menu format.
+    -f                         Menu format. 
                                default: \(.user_name)\t\(.game_name[:30])\t\(.title[:50])\t👤 \(.viewer_count)
   rofi-ttv search QUERY...     Search channels.
     QUERY                      Search query.
