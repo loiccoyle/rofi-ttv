@@ -54,7 +54,7 @@ Usage:
   rofi-ttv [-hf] [followed|search [QUERY]]
     -h                         Display this help message.
     -f                         Menu format.
-                               default: \(.user_name)\t\(.game_name[:30])\t\(.title[:50])\t👤 \(.viewer_count)
+                               default: \(.user_name//.display_name)\t\(.game_name[:30])\t\(.title[:50])\t👤 \(.viewer_count//"???")
   rofi-ttv search QUERY...     Search channels.
     QUERY                      Search query.
   rofi-ttv followed            Show followed channels.
